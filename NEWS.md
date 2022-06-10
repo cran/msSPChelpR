@@ -1,3 +1,21 @@
+# msSPChelpR 0.9.0
+
+### New Features
+* new function `calc_refrates()` to calculate age-, sex-, region-, year-specific reference rates from a long format dataframe with cancer cases that are counted for incident cases and then matched with a reference population. The resulting reference rates dataframe can directly be used with `sir_byfutime()` function.
+* functions gain new default `dattype = NULL` and thus are more flexible to take other source data types (Closes #73)
+
+### Breaking Changes
+* functions `asir`, `calc_futime*`, `calc_refrates`, `ir_crosstab_byfutime`, `pat_status*`, `renumber_time_id*`, and  `sir_byfutime` now by default are set to `dattype = NULL`. If you relied on automatic variable naming feature, you need to add `dattype = "seer"`or `dattype = "zfkd"` to your function call.
+* fix typo in attribute names: attributes are now correctly named `problems_missing_count_strata` and `problems_missing_fu_strata` (Closes #80)
+
+### Bug fixes
+* `sir_byfutime()`:
+  * attributes with notes and problems are now correctly saved to `results_df`
+
+### Internal
+* deprecated functions from `tidytable` package have been replaced (Closes #71 and #74)
+
+
 # msSPChelpR 0.8.7
 
 ### New Features

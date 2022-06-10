@@ -16,7 +16,19 @@
 
 <title>Introduction to the msSPChelpR package - from long dataset to SIR analyses</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -26,6 +38,7 @@
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -127,7 +140,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -139,7 +332,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">Introduction to the msSPChelpR package - from long dataset to SIR analyses</h1>
+<h1 class="title toc-ignore">Introduction to the msSPChelpR package -
+from long dataset to SIR analyses</h1>
 <h4 class="author">Marian Eberl</h4>
 <h4 class="date">26 October 2020</h4>
 
@@ -149,79 +343,162 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Introduction</h1>
 <p>This vignette explains how to use the functions:</p>
 <ul>
-<li><code>calc_futime()</code> to calculate follow-up time from index event until next event, death or end of follow-up date</li>
-<li><code>pat_status()</code> to determine patient status at end of follow-up</li>
-<li><code>renumber_time_id()</code> to calculate a consecutive index of events per case ID</li>
-<li><code>reshape_long()</code> to transpose dataset in wide format to data in long format</li>
-<li><code>reshape_wide()</code> to transpose dataset in long format to data in wide format (the wide format is required for many package functions)</li>
-<li><code>sir_byfutime()</code> to calculate standardized incidence ratios (SIRs) with custom grouping variables stratified by follow-up time</li>
-<li><code>summarize_sir_results()</code> to summarize detailed SIR results produced by <code>sir_byfutime()</code></li>
-<li><code>vital_status()</code> to determine vital status whether patient is alive or dead at end of follow-up</li>
+<li><code>calc_futime()</code> to calculate follow-up time from index
+event until next event, death or end of follow-up date</li>
+<li><code>pat_status()</code> to determine patient status at end of
+follow-up</li>
+<li><code>renumber_time_id()</code> to calculate a consecutive index of
+events per case ID</li>
+<li><code>reshape_long()</code> to transpose dataset in wide format to
+data in long format</li>
+<li><code>reshape_wide()</code> to transpose dataset in long format to
+data in wide format (the wide format is required for many package
+functions)</li>
+<li><code>sir_byfutime()</code> to calculate standardized incidence
+ratios (SIRs) with custom grouping variables stratified by follow-up
+time</li>
+<li><code>summarize_sir_results()</code> to summarize detailed SIR
+results produced by <code>sir_byfutime()</code></li>
+<li><code>vital_status()</code> to determine vital status whether
+patient is alive or dead at end of follow-up</li>
 </ul>
-<p>For some functions there are multiple variants of the same function using varying frameworks. They give the same results but will differ in execution time and memory use:</p>
+<p>For some functions there are multiple variants of the same function
+using varying frameworks. They give the same results but will differ in
+execution time and memory use:</p>
 <ul>
-<li><a href="https://markfairbanks.github.io/tidytable/"><code>tidytable</code></a> variants carry the suffix <code>_tt()</code></li>
-<li><a href="https://tidyr.tidyverse.org"><code>tidyr</code></a> variants carry the suffix <code>_tidyr()</code></li>
+<li><a href="https://markfairbanks.github.io/tidytable/"><code>tidytable</code></a>
+variants carry the suffix <code>_tt()</code></li>
+<li><a href="https://tidyr.tidyverse.org"><code>tidyr</code></a>
+variants carry the suffix <code>_tidyr()</code></li>
 </ul>
 </div>
 <div id="recommended-workflows" class="section level1">
 <h1>Recommended Workflows</h1>
 <div id="wf-calc-fu" class="section level2">
 <h2>Calculate follow-up times</h2>
-<p>It is recommended to run the following steps in the correct order to obtain accurate follow-up time calculations</p>
+<p>It is recommended to run the following steps in the correct order to
+obtain accurate follow-up time calculations</p>
 <ol style="list-style-type: decimal">
 <li><p><a href="#step-long">Use the long version dataset</a></p></li>
-<li><p><a href="#step-filter">Filter all cases</a> in the long version of the dataset that are relevant for your analysis. Make sure that:</p></li>
+<li><p><a href="#step-filter">Filter all cases</a> in the long version
+of the dataset that are relevant for your analysis. Make sure
+that:</p></li>
 </ol>
 <ul>
-<li>for each <code>case_id</code> the index event (e.g. First Cancer FC) is still included and is the one remaining row in the dataset with the smallest <code>case_id</code> (<code>TUMID3</code> variable for ZfKD data, and <code>SEQ_NUM</code> for SEER data)</li>
-<li>all <code>case_id</code>s might or might not get a countable incident event (e.g. Second Primary Cancer SPC). This event should be the second entry per <code>case_id</code> (second smallest <code>case_id</code>) if it is to be counted</li>
-<li>in the long version dataset a <code>count_var</code> should indicate whether the countable incident event (SPC) has occurred or not. Coded <code>0</code> for non-occurrence (or not counted event) and <code>1</code> for a counted incident event.</li>
+<li>for each <code>case_id</code> the index event (e.g. First Cancer FC)
+is still included and is the one remaining row in the dataset with the
+smallest <code>case_id</code> (<code>TUMID3</code> variable for ZfKD
+data, and <code>SEQ_NUM</code> for SEER data)</li>
+<li>all <code>case_id</code>s might or might not get a countable
+incident event (e.g. Second Primary Cancer SPC). This event should be
+the second entry per <code>case_id</code> (second smallest
+<code>case_id</code>) if it is to be counted</li>
+<li>in the long version dataset a <code>count_var</code> should indicate
+whether the countable incident event (SPC) has occurred or not. Coded
+<code>0</code> for non-occurrence (or not counted event) and
+<code>1</code> for a counted incident event.</li>
 </ul>
 <ol start="3" style="list-style-type: decimal">
-<li><p><a href="#step-renumber">Renumber filtered long dataset</a>: In the filter long dataset, you should run the helper function <code>msSPChelpR::renumber_time_id_dt()</code> (or non-data.table variant <code>msSPChelpR::renumber_time_id()</code>) that will renumber all events per <code>case_id</code> and (if step 1 is fulfilled) will assign each index event with <code>time_var_new = 1</code> and each second (possibly countable incident event) with <code>time_var_new = 2</code>. Any SIR related function will only count the second event, if additionally to <code>time_var_new = 2</code> for this row also <code>count_var = 1</code> is true.</p></li>
-<li><p><a href="#step-reshape-wide">Reshape dataset</a>: Run <code>msSPChelpR::reshape_wide_dt()</code> or non-data.table-variant <code>msSPChelpR::reshape_wide()</code>, so that dataset is transposed to wide format (1 row per <code>case_id</code>, creating variables such as <code>count_var.2</code>).</p></li>
-<li><p><a href="#step-spc">Set flag for Second Primary Cancer diagnosis</a>: After filtering and reshaping it is essential to set <code>p_spc</code> again. This variable will be used by later steps of the analysis.</p></li>
-<li><p><a href="#step-pat-status">Determine patient status</a> at a defined end of follow-up by using the <code>msSPChelpR::pat_status()</code> function. This date for end of follow-up must:</p></li>
+<li><p><a href="#step-renumber">Renumber filtered long dataset</a>: In
+the filter long dataset, you should run the helper function
+<code>msSPChelpR::renumber_time_id_dt()</code> (or non-data.table
+variant <code>msSPChelpR::renumber_time_id()</code>) that will renumber
+all events per <code>case_id</code> and (if step 1 is fulfilled) will
+assign each index event with <code>time_var_new = 1</code> and each
+second (possibly countable incident event) with
+<code>time_var_new = 2</code>. Any SIR related function will only count
+the second event, if additionally to <code>time_var_new = 2</code> for
+this row also <code>count_var = 1</code> is true.</p></li>
+<li><p><a href="#step-reshape-wide">Reshape dataset</a>: Run
+<code>msSPChelpR::reshape_wide_dt()</code> or non-data.table-variant
+<code>msSPChelpR::reshape_wide()</code>, so that dataset is transposed
+to wide format (1 row per <code>case_id</code>, creating variables such
+as <code>count_var.2</code>).</p></li>
+<li><p><a href="#step-spc">Set flag for Second Primary Cancer
+diagnosis</a>: After filtering and reshaping it is essential to set
+<code>p_spc</code> again. This variable will be used by later steps of
+the analysis.</p></li>
+<li><p><a href="#step-pat-status">Determine patient status</a> at a
+defined end of follow-up by using the
+<code>msSPChelpR::pat_status()</code> function. This date for end of
+follow-up must:</p></li>
 </ol>
 <ul>
-<li><p>be in “YYYY-MM-DD” format and is always defined via the <code>fu_end =</code> parameter</p></li>
-<li><p>must precede the end of data collection. E.g. if the last incident events for the dataset you are using are collected at the end of 2014, your <code>fu_end</code> must be <code>fu_end = &quot;2014-12-15&quot;</code> or earlier.</p></li>
-<li><p>Based on the newly calculated patient status, you might want to <a href="#step-filter-pat-status">exclude cases for which patient status cannot be determined</a></p></li>
+<li><p>be in “YYYY-MM-DD” format and is always defined via the
+<code>fu_end =</code> parameter</p></li>
+<li><p>must precede the end of data collection. E.g. if the last
+incident events for the dataset you are using are collected at the end
+of 2014, your <code>fu_end</code> must be
+<code>fu_end = &quot;2014-12-15&quot;</code> or earlier.</p></li>
+<li><p>Based on the newly calculated patient status, you might want to
+<a href="#step-filter-pat-status">exclude cases for which patient status
+cannot be determined</a></p></li>
 </ul>
 <ol start="7" style="list-style-type: decimal">
-<li><a href="#step-calc-futime">Calculate follow-up time</a> for the same dataset by using the <code>msSPChelpR::calc_futime()</code> function and the same <code>fu_end</code> as for step 6. By standard all functions of the <code>msSPChelpR</code> package require follow-up times as numeric years.</li>
+<li><a href="#step-calc-futime">Calculate follow-up time</a> for the
+same dataset by using the <code>msSPChelpR::calc_futime()</code>
+function and the same <code>fu_end</code> as for step 6. By standard all
+functions of the <code>msSPChelpR</code> package require follow-up times
+as numeric years.</li>
 </ol>
 </div>
 <div id="calculate-standardized-incidence-ratios-sir" class="section level2">
 <h2>Calculate Standardized Incidence Ratios (SIR)</h2>
-<p>In order to calculate SIR using the package functions, the following data structure is needed: * Wide format data <code>wide_df</code> with one row per patient that has encountered the index event (i.e. diagnosed with a first primary cancer FC)</p>
+<p>In order to calculate SIR using the package functions, the following
+data structure is needed: * Wide format data <code>wide_df</code> with
+one row per patient that has encountered the index event (i.e. diagnosed
+with a first primary cancer FC)</p>
 <ul>
-<li>The dataset <code>wide_df</code> needs to contain the following variables (columns) per patient (row):
+<li>The dataset <code>wide_df</code> needs to contain the following
+variables (columns) per patient (row):
 <ul>
-<li><code>region_var</code> - variable in df that contains information on region where case was incident.</li>
-<li><code>agegroup_var</code> - variable in df that contains information on age-group.</li>
-<li><code>sex_var</code> - variable in df that contains information on biological sex.</li>
-<li><code>year_var</code> - variable in df that contains information on year or year-period when case was incident.</li>
-<li><code>site_var</code> - variable in df that contains information on case (count event) diagnosis. Cases are usually the second cancers. Diagnoses can use any coding system (e.g. ICD) but coding system between dataset and reference data must be coherent.</li>
-<li><code>futime_var</code> - variable in df that contains follow-up time per person between date of first cancer and any of death, date of event (case), end of FU date (in years; whatever event comes first). In case you have not calculated the FU time yet, you can use the workflow described in the previous <a href="#wf-calc-fu">chapter</a>.</li>
+<li><code>region_var</code> - variable in df that contains information
+on region where case was incident.</li>
+<li><code>agegroup_var</code> - variable in df that contains information
+on age-group.</li>
+<li><code>sex_var</code> - variable in df that contains information on
+biological sex.</li>
+<li><code>year_var</code> - variable in df that contains information on
+year or year-period when case was incident.</li>
+<li><code>site_var</code> - variable in df that contains information on
+case (count event) diagnosis. Cases are usually the second cancers.
+Diagnoses can use any coding system (e.g. ICD) but coding system between
+dataset and reference data must be coherent.</li>
+<li><code>futime_var</code> - variable in df that contains follow-up
+time per person between date of first cancer and any of death, date of
+event (case), end of FU date (in years; whatever event comes first). In
+case you have not calculated the FU time yet, you can use the workflow
+described in the previous <a href="#wf-calc-fu">chapter</a>.</li>
 </ul></li>
 </ul>
-<p>If your data has the required structure, you can calculate and summarize SIRs with the following two steps:</p>
+<p>If your data has the required structure, you can calculate and
+summarize SIRs with the following two steps:</p>
 <ol start="8" style="list-style-type: decimal">
-<li><a href="#step-sir-byfutime">Calculate SIR</a> per SPC diagnosis with age, sex, region, period-specific strata using the <code>msSPChelpR::sir_byfutime()</code> function. For this calculation usually a reference dataset is required that defines the population standard rates. <code>refrates_df</code> must use the same category coding of age, sex, region, year and cancer_site as <code>agegroup_var</code>, <code>sex_var</code>, <code>region_var</code>, <code>year_var</code> and <code>site_var</code></li>
+<li><a href="#step-sir-byfutime">Calculate SIR</a> per SPC diagnosis
+with age, sex, region, period-specific strata using the
+<code>msSPChelpR::sir_byfutime()</code> function. For this calculation
+usually a reference dataset is required that defines the population
+standard rates. <code>refrates_df</code> must use the same category
+coding of age, sex, region, year and cancer_site as
+<code>agegroup_var</code>, <code>sex_var</code>,
+<code>region_var</code>, <code>year_var</code> and
+<code>site_var</code></li>
 </ol>
 <ul>
-<li>The theory behind calculating stratified SIRs is explained in the chapter on <a href="#theo-sir">basics on SIRs</a></li>
+<li>The theory behind calculating stratified SIRs is explained in the
+chapter on <a href="#theo-sir">basics on SIRs</a></li>
 </ul>
 <ol start="9" style="list-style-type: decimal">
-<li><a href="#step-summarize-sir">Summarize SIR results</a> using the <code>msSPChelpR::summarize_sir_results()</code> function on the stratified sir results produced by the previous step.</li>
+<li><a href="#step-summarize-sir">Summarize SIR results</a> using the
+<code>msSPChelpR::summarize_sir_results()</code> function on the
+stratified sir results produced by the previous step.</li>
 </ol>
 </div>
 </div>
 <div id="theo-sir" class="section level1">
 <h1>Theory behind SIRs</h1>
-<p>In the next version of this vignette the theoretical considerations how SIRs are calculated will be explained in this chapter.</p>
+<p>In the next version of this vignette the theoretical considerations
+how SIRs are calculated will be explained in this chapter.</p>
 </div>
 <div id="examples" class="section level1">
 <h1>Examples</h1>
@@ -231,11 +508,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3>Step 1 - Long dataset</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;dplyr&#39;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:stats&#39;:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Attache Paket: &#39;dplyr&#39;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Die folgenden Objekte sind maskiert von &#39;package:stats&#39;:</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     filter, lag</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:base&#39;:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Die folgenden Objekte sind maskiert von &#39;package:base&#39;:</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
@@ -348,28 +625,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   SEQ_NUM.2 &lt;int&gt;, registry.2 &lt;chr&gt;, sex.2 &lt;chr&gt;, race.2 &lt;chr&gt;,</span></span>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   datebirth.2 &lt;date&gt;, t_datediag.2 &lt;date&gt;, t_site_icd.2 &lt;chr&gt;, t_dco.2 &lt;chr&gt;,</span></span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_age.2 &lt;int&gt;, datedeath.2 &lt;date&gt;, p_alive.2 &lt;chr&gt;, p_dodmin.2 &lt;date&gt;,</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_agegroup.2 &lt;chr&gt;, t_yeardiag.2 &lt;chr&gt;, SEQ_NUM.3 &lt;int&gt;, registry.3 &lt;chr&gt;,</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   sex.3 &lt;chr&gt;, race.3 &lt;chr&gt;, datebirth.3 &lt;date&gt;, t_datediag.3 &lt;date&gt;,</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_site_icd.3 &lt;chr&gt;, t_dco.3 &lt;chr&gt;, fc_age.3 &lt;int&gt;, datedeath.3 &lt;date&gt;,</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   p_alive.3 &lt;chr&gt;, p_dodmin.3 &lt;date&gt;, fc_agegroup.3 &lt;chr&gt;,</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_yeardiag.3 &lt;chr&gt;, SEQ_NUM.4 &lt;int&gt;, registry.4 &lt;chr&gt;, sex.4 &lt;chr&gt;,</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   race.4 &lt;chr&gt;, datebirth.4 &lt;date&gt;, t_datediag.4 &lt;date&gt;, t_site_icd.4 &lt;chr&gt;,</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_dco.4 &lt;chr&gt;, fc_age.4 &lt;int&gt;, datedeath.4 &lt;date&gt;, p_alive.4 &lt;chr&gt;,</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   p_dodmin.4 &lt;date&gt;, fc_agegroup.4 &lt;chr&gt;, t_yeardiag.4 &lt;chr&gt;,</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   SEQ_NUM.5 &lt;int&gt;, registry.5 &lt;chr&gt;, sex.5 &lt;chr&gt;, race.5 &lt;chr&gt;,</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   datebirth.5 &lt;date&gt;, t_datediag.5 &lt;date&gt;, t_site_icd.5 &lt;chr&gt;, t_dco.5 &lt;chr&gt;,</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_age.5 &lt;int&gt;, datedeath.5 &lt;date&gt;, p_alive.5 &lt;chr&gt;, p_dodmin.5 &lt;date&gt;,</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_agegroup.5 &lt;chr&gt;, t_yeardiag.5 &lt;chr&gt;, SEQ_NUM.6 &lt;int&gt;, registry.6 &lt;chr&gt;,</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   sex.6 &lt;chr&gt;, race.6 &lt;chr&gt;, datebirth.6 &lt;date&gt;, t_datediag.6 &lt;date&gt;,</span></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_site_icd.6 &lt;chr&gt;, t_dco.6 &lt;chr&gt;, fc_age.6 &lt;int&gt;, datedeath.6 &lt;date&gt;,</span></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   p_alive.6 &lt;chr&gt;, p_dodmin.6 &lt;date&gt;, fc_agegroup.6 &lt;chr&gt;,</span></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_yeardiag.6 &lt;chr&gt;, SEQ_NUM.7 &lt;int&gt;, registry.7 &lt;chr&gt;, sex.7 &lt;chr&gt;,</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   race.7 &lt;chr&gt;, datebirth.7 &lt;date&gt;, t_datediag.7 &lt;date&gt;, t_site_icd.7 &lt;chr&gt;,</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_dco.7 &lt;chr&gt;, fc_age.7 &lt;int&gt;, datedeath.7 &lt;date&gt;, p_alive.7 &lt;chr&gt;,</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   p_dodmin.7 &lt;date&gt;, fc_agegroup.7 &lt;chr&gt;, t_yeardiag.7 &lt;chr&gt;,</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   SEQ_NUM.8 &lt;int&gt;, registry.8 &lt;chr&gt;, sex.8 &lt;chr&gt;, race.8 &lt;chr&gt;,</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   datebirth.8 &lt;date&gt;, t_datediag.8 &lt;date&gt;, t_site_icd.8 &lt;chr&gt;, t_dco.8 &lt;chr&gt;,</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   ...</span></span></code></pre></div>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_agegroup.2 &lt;chr&gt;, t_yeardiag.2 &lt;chr&gt;, SEQ_NUM.3 &lt;int&gt;, ...</span></span></code></pre></div>
 </div>
 <div id="step-spc" class="section level3">
 <h3>Step 5 - Recalculate <code>p_spc</code></h3>
@@ -504,30 +760,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   SEQ_NUM.2 &lt;int&gt;, registry.2 &lt;chr&gt;, sex.2 &lt;chr&gt;, race.2 &lt;chr&gt;,</span></span>
 <span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   datebirth.2 &lt;date&gt;, t_datediag.2 &lt;date&gt;, t_site_icd.2 &lt;chr&gt;, t_dco.2 &lt;chr&gt;,</span></span>
 <span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_age.2 &lt;int&gt;, datedeath.2 &lt;date&gt;, p_alive.2 &lt;chr&gt;, p_dodmin.2 &lt;date&gt;,</span></span>
-<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_agegroup.2 &lt;chr&gt;, t_yeardiag.2 &lt;chr&gt;, SEQ_NUM.3 &lt;int&gt;, registry.3 &lt;chr&gt;,</span></span>
-<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   sex.3 &lt;chr&gt;, race.3 &lt;chr&gt;, datebirth.3 &lt;date&gt;, t_datediag.3 &lt;date&gt;,</span></span>
-<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_site_icd.3 &lt;chr&gt;, t_dco.3 &lt;chr&gt;, fc_age.3 &lt;int&gt;, datedeath.3 &lt;date&gt;,</span></span>
-<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   p_alive.3 &lt;chr&gt;, p_dodmin.3 &lt;date&gt;, fc_agegroup.3 &lt;chr&gt;,</span></span>
-<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_yeardiag.3 &lt;chr&gt;, SEQ_NUM.4 &lt;int&gt;, registry.4 &lt;chr&gt;, sex.4 &lt;chr&gt;,</span></span>
-<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   race.4 &lt;chr&gt;, datebirth.4 &lt;date&gt;, t_datediag.4 &lt;date&gt;, t_site_icd.4 &lt;chr&gt;,</span></span>
-<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_dco.4 &lt;chr&gt;, fc_age.4 &lt;int&gt;, datedeath.4 &lt;date&gt;, p_alive.4 &lt;chr&gt;,</span></span>
-<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   p_dodmin.4 &lt;date&gt;, fc_agegroup.4 &lt;chr&gt;, t_yeardiag.4 &lt;chr&gt;,</span></span>
-<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   SEQ_NUM.5 &lt;int&gt;, registry.5 &lt;chr&gt;, sex.5 &lt;chr&gt;, race.5 &lt;chr&gt;,</span></span>
-<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   datebirth.5 &lt;date&gt;, t_datediag.5 &lt;date&gt;, t_site_icd.5 &lt;chr&gt;, t_dco.5 &lt;chr&gt;,</span></span>
-<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_age.5 &lt;int&gt;, datedeath.5 &lt;date&gt;, p_alive.5 &lt;chr&gt;, p_dodmin.5 &lt;date&gt;,</span></span>
-<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_agegroup.5 &lt;chr&gt;, t_yeardiag.5 &lt;chr&gt;, SEQ_NUM.6 &lt;int&gt;, registry.6 &lt;chr&gt;,</span></span>
-<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   sex.6 &lt;chr&gt;, race.6 &lt;chr&gt;, datebirth.6 &lt;date&gt;, t_datediag.6 &lt;date&gt;,</span></span>
-<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_site_icd.6 &lt;chr&gt;, t_dco.6 &lt;chr&gt;, fc_age.6 &lt;int&gt;, datedeath.6 &lt;date&gt;,</span></span>
-<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   p_alive.6 &lt;chr&gt;, p_dodmin.6 &lt;date&gt;, fc_agegroup.6 &lt;chr&gt;,</span></span>
-<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_yeardiag.6 &lt;chr&gt;, SEQ_NUM.7 &lt;int&gt;, registry.7 &lt;chr&gt;, sex.7 &lt;chr&gt;,</span></span>
-<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   race.7 &lt;chr&gt;, datebirth.7 &lt;date&gt;, t_datediag.7 &lt;date&gt;, t_site_icd.7 &lt;chr&gt;,</span></span>
-<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   t_dco.7 &lt;chr&gt;, fc_age.7 &lt;int&gt;, datedeath.7 &lt;date&gt;, p_alive.7 &lt;chr&gt;,</span></span>
-<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   p_dodmin.7 &lt;date&gt;, fc_agegroup.7 &lt;chr&gt;, t_yeardiag.7 &lt;chr&gt;,</span></span>
-<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   SEQ_NUM.8 &lt;int&gt;, registry.8 &lt;chr&gt;, sex.8 &lt;chr&gt;, race.8 &lt;chr&gt;,</span></span>
-<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   datebirth.8 &lt;date&gt;, t_datediag.8 &lt;date&gt;, t_site_icd.8 &lt;chr&gt;, t_dco.8 &lt;chr&gt;,</span></span>
-<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   ...</span></span></code></pre></div>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fc_agegroup.2 &lt;chr&gt;, t_yeardiag.2 &lt;chr&gt;, SEQ_NUM.3 &lt;int&gt;, ...</span></span></code></pre></div>
 <div id="step-filter-pat-status" class="section level4">
-<h4>Step 6b - Remove patients irrelevant to analysis depending on status</h4>
+<h4>Step 6b - Remove patients irrelevant to analysis depending on
+status</h4>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>usdata_wide <span class="ot">&lt;-</span> usdata_wide <span class="sc">%&gt;%</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>p_status <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;NA - Patient not born before end of FU&quot;</span>,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">&quot;NA - Patient did not develop cancer before end of FU&quot;</span>,</span>
@@ -592,80 +828,132 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_var =</span> <span class="st">&quot;fc_agegroup.1&quot;</span>,</span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex_var =</span> <span class="st">&quot;sex.1&quot;</span>,</span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">year_var =</span> <span class="st">&quot;t_yeardiag.1&quot;</span>,</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">site_var =</span> <span class="st">&quot;t_site_icd.1&quot;</span>, <span class="co">#using grouping by second cancer incidence</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">futime_var =</span> <span class="st">&quot;p_futimeyrs&quot;</span>,</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [INFO Cases 0 PYARs] There are conflicts where strata with 0 follow-up time have data in observed. </span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 4 x 10</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   age    sex    region     year  race.1 t_site to1month i_observed i_pyar n_base</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 05 - ~ Male   SEER Reg ~ 2015~ Other  C34           1          1      0      1</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 15 - ~ Male   SEER Reg ~ 2005~ Black  C34           1          1      0      1</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 85 - ~ Female SEER Reg ~ 1995~ Black  C34           1          2      0      2</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 85 - ~ Male   SEER Reg ~ 2010~ Other  C34           1          1      0      1 </span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Check attribute `problems_not_empty` of results to see what strata are affected. </span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This might be caused by cases where SPC occured at the same day as first cancer. </span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You can check this by excluding all cases from wide_df, where date of first diagnosis is equal.</span></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [INFO Cases 0 PYARs] There are conflicts where strata with 0 follow-up time have data in observed. </span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 4 x 10</span></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   age    sex    region    year  race.1 t_site Total0toInfyears i_observed i_pyar</span></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;             &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 05 - ~ Male   SEER Reg~ 2015~ Other  C34                   1          1      0</span></span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 15 - ~ Male   SEER Reg~ 2005~ Black  C34                   1          1      0</span></span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 85 - ~ Female SEER Reg~ 1995~ Black  C34                   1          2      0</span></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 85 - ~ Male   SEER Reg~ 2010~ Other  C34                   1          1      0</span></span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 1 more variable: n_base &lt;dbl&gt; </span></span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Check attribute `problems_not_empty` of results to see what strata are affected. </span></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This might be caused by cases where SPC occured at the same day as first cancer. </span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You can check this by excluding all cases from wide_df, where date of first diagnosis is equal.</span></span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [INFO Cases 0 PYARs] There are conflicts where strata with 0 follow-up time have data in observed. </span></span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 1 x 10</span></span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   age    sex   region     year  t_dco.1 t_site to1month i_observed i_pyar n_base</span></span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 80 - ~ Male  SEER Reg ~ 2010~ DCO ca~ C34           1          1      0      1 </span></span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Check attribute `problems_not_empty` of results to see what strata are affected. </span></span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This might be caused by cases where SPC occured at the same day as first cancer. </span></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You can check this by excluding all cases from wide_df, where date of first diagnosis is equal.</span></span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [INFO Cases 0 PYARs] There are conflicts where strata with 0 follow-up time have data in observed. </span></span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 1 x 10</span></span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   age    sex   region    year  t_dco.1 t_site Total0toInfyears i_observed i_pyar</span></span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;             &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 80 - ~ Male  SEER Reg~ 2010~ DCO ca~ C34                   1          1      0</span></span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 1 more variable: n_base &lt;dbl&gt; </span></span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Check attribute `problems_not_empty` of results to see what strata are affected. </span></span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This might be caused by cases where SPC occured at the same day as first cancer. </span></span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You can check this by excluding all cases from wide_df, where date of first diagnosis is equal.</span></span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  There are observed cases in the results file that do not occur in the refrates_df. </span></span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; A possible explanation can be: </span></span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  - DCO cases </span></span>
-<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  - diagnosis of second cancer occured in different time period than first cancer </span></span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following strata are affected: </span></span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 166 x 21</span></span>
-<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    yvar_name yvar_label fu_time  age    sex   region     year  t_site i_observed</span></span>
-<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;</span></span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1 total_var Overall    1-5 yea~ 60 - ~ Male  SEER Reg ~ 2010~ C34            17</span></span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  2 total_var Overall    1-5 yea~ 65 - ~ Male  SEER Reg ~ 2015~ C34            18</span></span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3 total_var Overall    5-10 ye~ 60 - ~ Male  SEER Reg ~ 2010~ C34            20</span></span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4 total_var Overall    5-10 ye~ 60 - ~ Male  SEER Reg ~ 2010~ C34            22</span></span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  5 total_var Overall    5-10 ye~ 70 - ~ Male  SEER Reg ~ 2005~ C34            12</span></span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  6 total_var Overall    5-10 ye~ 75 - ~ Fema~ SEER Reg ~ 2005~ C34            13</span></span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  7 total_var Overall    10+ yea~ 25 - ~ Fema~ SEER Reg ~ 1995~ C34            14</span></span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  8 total_var Overall    10+ yea~ 60 - ~ Fema~ SEER Reg ~ 1995~ C34            18</span></span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  9 total_var Overall    10+ yea~ 60 - ~ Fema~ SEER Reg ~ 1995~ C34            16</span></span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 total_var Overall    10+ yea~ 65 - ~ Male  SEER Reg ~ 2000~ C34            29</span></span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 156 more rows, and 12 more variables: i_pyar &lt;dbl&gt;, n_base &lt;dbl&gt;,</span></span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   race &lt;chr&gt;, incidence_cases &lt;int&gt;, population_pyar &lt;int&gt;,</span></span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   incidence_crude_rate &lt;dbl&gt;, i_expected &lt;dbl&gt;, sir &lt;dbl&gt;, sir_lci &lt;dbl&gt;,</span></span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   sir_uci &lt;dbl&gt;, fu_time_sort &lt;int&gt;, yvar_sort &lt;int&gt;</span></span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Check attribute `notes_refcases` of results to see what strata are affected.</span></span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="co"># sircalc_results %&gt;% print(n = 100) # uncomment after tidytable 0.5.6 release</span></span></code></pre></div>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_var =</span> <span class="st">&quot;race.1&quot;</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">site_var =</span> <span class="st">&quot;t_site_icd.1&quot;</span>, <span class="co">#using grouping by second cancer incidence</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">futime_var =</span> <span class="st">&quot;p_futimeyrs&quot;</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [INFO Cases 0 PYARs] There are conflicts where strata with 0 follow-up time have data in observed.</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; i 40 strata are affected.</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  - This might be caused by cases where SPC occured at the same day as first cancer.</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  - You can check this by excluding all cases from wide_df, where date of first diagnosis is equal.</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ! Check attribute `problems_not_empty` of results to see what strata are affected.</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [INFO Unexpected Cases] There are observed cases in the results file that do not occur in the refrates_df.</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; i 2682 strata are affected.</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; A possible explanation can be:</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  - DCO cases or</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  - diagnosis of second cancer occured in different time period than first cancer</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ! Check attribute `notes_refcases` of results to see what strata are affected.</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>sircalc_results <span class="sc">%&gt;%</span> <span class="fu">print</span>(<span class="at">n =</span> <span class="dv">100</span>)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 421,296 x 22</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     age    region sex   race  year  yvar_name yvar_label fu_time t_site observed</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   1 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    to 1 m~ C14           0</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   2 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    to 1 m~ C18           0</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   3 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    to 1 m~ C34           0</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   4 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    to 1 m~ C44           0</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   5 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    to 1 m~ C50           0</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   6 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    to 1 m~ C54           0</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   7 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    to 1 m~ C64           0</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   8 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    to 1 m~ C80           0</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   9 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.0833~ C14           0</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  10 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.0833~ C18           0</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  11 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.0833~ C34           0</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  12 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.0833~ C44           0</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  13 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.0833~ C50           0</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  14 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.0833~ C54           0</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  15 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.0833~ C64           0</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  16 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.0833~ C80           0</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  17 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.167-~ C14           0</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  18 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.167-~ C18           0</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  19 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.167-~ C34           0</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  20 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.167-~ C44           0</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  21 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.167-~ C50           0</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  22 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.167-~ C54           0</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  23 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.167-~ C64           0</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  24 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    0.167-~ C80           0</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  25 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    1-5 ye~ C14           0</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  26 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    1-5 ye~ C18           0</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  27 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    1-5 ye~ C34           0</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  28 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    1-5 ye~ C44           0</span></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  29 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    1-5 ye~ C50           0</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  30 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    1-5 ye~ C54           0</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  31 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    1-5 ye~ C64           0</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  32 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    1-5 ye~ C80           0</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  33 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    5-10 y~ C14           0</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  34 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    5-10 y~ C18           0</span></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  35 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    5-10 y~ C34           1</span></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  36 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    5-10 y~ C44           0</span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  37 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    5-10 y~ C50           0</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  38 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    5-10 y~ C54           0</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  39 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    5-10 y~ C64           0</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  40 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    5-10 y~ C80           0</span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  41 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    Total ~ C14           0</span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  42 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    Total ~ C18           0</span></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  43 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    Total ~ C34           1</span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  44 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    Total ~ C44           0</span></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  45 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    Total ~ C50           0</span></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  46 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    Total ~ C54           0</span></span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  47 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    Total ~ C64           0</span></span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  48 00 - ~ SEER ~ Fema~ Black 1990~ total_var Overall    Total ~ C80           0</span></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  49 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      to 1 m~ C14           0</span></span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  50 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      to 1 m~ C18           0</span></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  51 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      to 1 m~ C34           0</span></span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  52 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      to 1 m~ C44           0</span></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  53 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      to 1 m~ C50           0</span></span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  54 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      to 1 m~ C54           0</span></span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  55 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      to 1 m~ C64           0</span></span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  56 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      to 1 m~ C80           0</span></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  57 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.0833~ C14           0</span></span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  58 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.0833~ C18           0</span></span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  59 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.0833~ C34           0</span></span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  60 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.0833~ C44           0</span></span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  61 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.0833~ C50           0</span></span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  62 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.0833~ C54           0</span></span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  63 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.0833~ C64           0</span></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  64 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.0833~ C80           0</span></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  65 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.167-~ C14           0</span></span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  66 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.167-~ C18           0</span></span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  67 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.167-~ C34           0</span></span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  68 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.167-~ C44           0</span></span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  69 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.167-~ C50           0</span></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  70 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.167-~ C54           0</span></span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  71 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.167-~ C64           0</span></span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  72 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      0.167-~ C80           0</span></span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  73 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      1-5 ye~ C14           0</span></span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  74 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      1-5 ye~ C18           0</span></span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  75 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      1-5 ye~ C34           0</span></span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  76 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      1-5 ye~ C44           0</span></span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  77 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      1-5 ye~ C50           0</span></span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  78 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      1-5 ye~ C54           0</span></span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  79 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      1-5 ye~ C64           0</span></span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  80 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      1-5 ye~ C80           0</span></span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  81 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      5-10 y~ C14           0</span></span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  82 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      5-10 y~ C18           0</span></span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  83 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      5-10 y~ C34           1</span></span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  84 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      5-10 y~ C44           0</span></span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  85 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      5-10 y~ C50           0</span></span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  86 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      5-10 y~ C54           0</span></span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  87 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      5-10 y~ C64           0</span></span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  88 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      5-10 y~ C80           0</span></span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  89 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      Total ~ C14           0</span></span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  90 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      Total ~ C18           0</span></span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  91 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      Total ~ C34           1</span></span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  92 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      Total ~ C44           0</span></span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  93 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      Total ~ C50           0</span></span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  94 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      Total ~ C54           0</span></span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  95 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      Total ~ C64           0</span></span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  96 00 - ~ SEER ~ Fema~ Black 1990~ race.1    Black      Total ~ C80           0</span></span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  97 00 - ~ SEER ~ Fema~ Black 1990~ t_dco.1   histology  to 1 m~ C14           0</span></span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  98 00 - ~ SEER ~ Fema~ Black 1990~ t_dco.1   histology  to 1 m~ C18           0</span></span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  99 00 - ~ SEER ~ Fema~ Black 1990~ t_dco.1   histology  to 1 m~ C34           0</span></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 100 00 - ~ SEER ~ Fema~ Black 1990~ t_dco.1   histology  to 1 m~ C44           0</span></span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ... with 421,196 more rows, and 12 more variables: expected &lt;dbl&gt;, sir &lt;dbl&gt;,</span></span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   sir_lci &lt;dbl&gt;, sir_uci &lt;dbl&gt;, pyar &lt;dbl&gt;, n_base &lt;dbl&gt;,</span></span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   ref_inc_cases &lt;dbl&gt;, ref_population_pyar &lt;dbl&gt;, ref_inc_crude_rate &lt;dbl&gt;,</span></span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   fu_time_sort &lt;int&gt;, yvar_sort &lt;int&gt;, warning &lt;chr&gt;</span></span></code></pre></div>
 </div>
 <div id="step-summarize-sir" class="section level3">
 <h3>Step 9 - Summarize SIR results</h3>
@@ -685,27 +973,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                        ) <span class="sc">%&gt;%</span></span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>region, <span class="sc">-</span>age, <span class="sc">-</span>year, <span class="sc">-</span>race, <span class="sc">-</span>sex, <span class="sc">-</span>yvar_name)</span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: The results file `sir_df` contains observed cases in i_observed that do not occur in the refrates_df (ref_inc_cases).</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Therefore calculation of the variables n_base and ref_population_pyar is ambiguous. </span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; We take the first value of each variable. Expect small inconsistencies in the calculation of n_base, ref_population_pyar and ref_inc_crude_rate across strata. </span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; If you want to know more, please check the `warnings` column of `sir_df`.</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Therefore calculation of the variables n_base and ref_population_pyar is ambiguous.</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; We take the first value of each variable. Expect small inconsistencies in the calculation of n_base, ref_population_pyar and ref_inc_crude_rate across strata.</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ! If you want to know more, please check the `warnings` column of `sir_df`.</span></span>
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 7 x 8</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   yvar_label fu_time       fu_time_sort t_site observed expected   sir sir_ci   </span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt;                &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;    </span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 Overall    to 1 month               1 Total       327     18.1 18.1  16.19 - ~</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 Overall    0.0833-0.167~            2 Total        80     17.9  4.46 3.54 - 5~</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 Overall    0.167-1 years            3 Total       724    172.   4.2  3.9 - 4.~</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 Overall    1-5 years                4 Total      2998    668.   4.49 4.33 - 4~</span></span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 Overall    5-10 years               5 Total      3089    531.   5.82 5.61 - 6~</span></span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 Overall    10+ years                6 Total      4241    438.   9.69 9.4 - 9.~</span></span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 Overall    Total 0 to I~            7 Total     11459   1845.   6.21 6.1 - 6.~</span></span></code></pre></div>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   yvar_label fu_time          fu_time_sort t_site observed expected   sir sir_ci</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt;                   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; </span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 Overall    to 1 month                  1 Total       327     20.6 15.9  14.23~</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 Overall    0.0833-0.167 ye~            2 Total        80     20.4  3.92 3.11 ~</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 Overall    0.167-1 years               3 Total       724    196.   3.69 3.43 ~</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 Overall    1-5 years                   4 Total      2998    760.   3.95 3.81 ~</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 Overall    5-10 years                  5 Total      3089    605.   5.1  4.92 ~</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 Overall    10+ years                   6 Total      4241    500.   8.49 8.23 ~</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 Overall    Total 0 to Inf ~            7 Total     11459   2102.   5.45 5.35 ~</span></span></code></pre></div>
 </div>
 </div>
 <div id="built-with" class="section level2">
 <h2>Built with</h2>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; R version 4.0.5 (2021-03-31)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; R version 4.1.3 (2022-03-10)</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Platform: x86_64-w64-mingw32/x64 (64-bit)</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running under: Windows 10 x64 (build 17763)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running under: Windows 10 x64 (build 19044)</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Matrix products: default</span></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
@@ -718,21 +1006,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; other attached packages:</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] msSPChelpR_0.8.7 magrittr_2.0.1   dplyr_1.0.6     </span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] msSPChelpR_0.9.0 magrittr_2.0.3   dplyr_1.0.9     </span></span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] Rcpp_1.0.6        pillar_1.6.1      bslib_0.2.5.1     compiler_4.0.5   </span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [5] jquerylib_0.1.4   prettyunits_1.1.1 progress_1.2.2    forcats_0.5.1    </span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [9] tools_4.0.5       digest_0.6.27     jsonlite_1.7.2    lubridate_1.7.10 </span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [13] evaluate_0.14     lifecycle_1.0.0   tibble_3.1.2      pkgconfig_2.0.3  </span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [17] rlang_0.4.11      DBI_1.1.1         cli_2.5.0         rstudioapi_0.13  </span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [21] yaml_2.2.1        haven_2.4.1       xfun_0.23         stringr_1.4.0    </span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [25] knitr_1.33        hms_1.1.0         generics_0.1.0    vctrs_0.3.8      </span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [29] sass_0.4.0        sjlabelled_1.1.8  tidyselect_1.1.1  snakecase_0.11.0 </span></span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [33] glue_1.4.2        data.table_1.14.0 R6_2.5.0          fansi_0.5.0      </span></span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [37] rmarkdown_2.9     purrr_0.3.4       tidyr_1.1.3       ps_1.6.0         </span></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [41] ellipsis_0.3.2    htmltools_0.5.1.1 insight_0.14.1    assertthat_0.2.1 </span></span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [45] tidytable_0.6.2   utf8_1.2.1        stringi_1.6.2     crayon_1.4.1</span></span></code></pre></div>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] pillar_1.7.0      bslib_0.3.1       compiler_4.1.3    jquerylib_0.1.4  </span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [5] prettyunits_1.1.1 progress_1.2.2    forcats_0.5.1     tools_4.1.3      </span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [9] digest_0.6.29     jsonlite_1.8.0    lubridate_1.8.0   evaluate_0.15    </span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [13] lifecycle_1.0.1   tibble_3.1.7      pkgconfig_2.0.3   rlang_1.0.2      </span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [17] cli_3.3.0         DBI_1.1.2         rstudioapi_0.13   yaml_2.3.5       </span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [21] haven_2.5.0       xfun_0.31         fastmap_1.1.0     stringr_1.4.0    </span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [25] knitr_1.39        hms_1.1.1         generics_0.1.2    vctrs_0.4.1      </span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [29] sass_0.4.1        sjlabelled_1.2.0  tidyselect_1.1.2  data.table_1.14.2</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [33] snakecase_0.11.0  glue_1.6.2        R6_2.5.1          fansi_1.0.3      </span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [37] rmarkdown_2.14    purrr_0.3.4       tidyr_1.2.0       ellipsis_0.3.2   </span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [41] htmltools_0.5.2   insight_0.17.1    assertthat_0.2.1  tidytable_0.8.0  </span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [45] utf8_1.2.2        stringi_1.7.6     crayon_1.5.1</span></span></code></pre></div>
 </div>
 </div>
 

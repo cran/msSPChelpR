@@ -24,7 +24,6 @@
 
 reshape_wide_tt <- function(df, case_id_var, time_id_var, timevar_max = 6, datsize = Inf){
   
-  timevar_max <- rlang::enquo(timevar_max)
   case_id_var <- rlang::ensym(case_id_var)
   time_id_var <- rlang::ensym(time_id_var)
   
@@ -39,19 +38,19 @@ reshape_wide_tt <- function(df, case_id_var, time_id_var, timevar_max = 6, datsi
   ### determine maximum number of cases per patient and deleting all cases > timevar_max
   max_time <- max(as.numeric(df[[rlang::as_name(time_id_var)]]), na.rm = TRUE)
   
-  if(max_time > rlang::eval_tidy(timevar_max)){
-    rlang::inform(paste("Long dataset had too many cases per patient. Wide dataset is limited to ", rlang::eval_tidy(timevar_max)," cases per id as defined in timevar_max option."))
+  if(max_time > timevar_max){
+    rlang::inform(paste("Long dataset had too many cases per patient. Wide dataset is limited to ", timevar_max," cases per id as defined in timevar_max option."))
     
     df <- df %>%
       #sort by case_id and time_id_var
-      tidytable::arrange.(!!case_id_var, !!time_id_var) %>%
+      tidytable::arrange(!!case_id_var, !!time_id_var) %>%
       #calculate new renumbered variable group by case_id_var
-      tidytable::mutate.(counter = as.integer(tidytable::row_number.()), .by = !!case_id_var) %>%
+      tidytable::mutate(counter = as.integer(tidytable::row_number()), .by = !!case_id_var) %>%
       #filter based on new renumbered variable
-      tidytable::filter.(counter <= !!timevar_max) %>% 
-      tidytable::select.(-counter)
+      tidytable::filter(counter <= timevar_max) %>% 
+      tidytable::select(-counter)
     
-    max_time <- as.numeric(rlang::eval_tidy(timevar_max))
+    max_time <- timevar_max
     
   }
   
@@ -64,15 +63,15 @@ reshape_wide_tt <- function(df, case_id_var, time_id_var, timevar_max = 6, datsi
     c(.)
   
   ### perform pivot_wider
-  df %>% tidytable::pivot_wider.(
+  df %>% tidytable::pivot_wider(
     names_from = {{time_id_var}}, 
     values_from = tidyselect::all_of(trans_vars),
     names_sep = "."
   ) %>%
     #sort by case_id_var
-    tidytable::arrange.(as.numeric(rlang::eval_tidy(!!case_id_var))) %>%
+    tidytable::arrange(as.numeric(rlang::eval_tidy(!!case_id_var))) %>%
     #order columns by old col order 
-    tidytable::relocate.(tidyselect::all_of(c(rlang::as_name(case_id_var), 
+    tidytable::relocate(tidyselect::all_of(c(rlang::as_name(case_id_var), 
                                               col_order)))
   
 }

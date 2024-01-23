@@ -1,3 +1,27 @@
+# msSPChelpR 0.9.1
+
+### New Features
+* new function `histgroup_iarc()` to create variable for groups of malignant neoplasms considered to be histologically 'different' for the purpose of defining multiple tumors, ICD-O-3 (see #100)
+* some functions gain new `quiet` argument to suppress `rlang::warn()` and `rlang::inform()` messages. You can use this when you have checked your results for correctness and want to reduce message output, but keep the progress bars.
+* `asir()`: add World Standard Population 2000-2025 for function with option `std_pop=="WHO2000"` as described here: https://seer.cancer.gov/stdpopulations/world.who.html
+* `sir_byfutime()` gains new argument `expect_missing_refstrata_df`. You can define another dataframe that contains strata expected to be missing from refrates_df (because they are not explicitly coded with incidence = 0). This can be helpful, if refrates_df has a lot of strata and 0 incidence strata have been removed to save storage space. Internally, the rows of expect_missing_refstrata_df will be appended to refrates_df. This reduces the number of lines reported in attribute `problems_missing_ref_strata`. Default setting is `expect_missing_refstrata_df = NULL`.
+* sample data set for `data("us_second_cancer")` gains new variable `t_hist` on histology, i.e. ICD-O-3-Code on tumor morphology (4 digits)
+
+
+### Breaking Changes
+* no breaking changes in this version
+
+### Bug fixes
+* make `calc_refrates()` more robust for missing `race_var` (Closes #89)
+* fix bug in `calc_refrates()` using `calc_totals == TRUE` (Closes #90)
+* fix bug in `calc_refrates()` using numeric versions of `fill_sites` (Closes #92)
+* fix bug in `asir()` that throws error for variable not needed (Closes #95) 
+
+### Internal
+* replace progress bars by `cli`
+* deprecate `verb.()`syntax from tidytable (Closes #94)
+
+
 # msSPChelpR 0.9.0
 
 ### New Features

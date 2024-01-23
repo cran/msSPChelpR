@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -27,7 +27,7 @@ ids <- us_second_cancer %>%
 filtered_usdata <- us_second_cancer %>%
   #filter according to above detected ids with any lung cancer diagnosis
   filter(fake_id %in% ids) %>%
-   arrange(fake_id)
+  arrange(fake_id)
 
 filtered_usdata
 
@@ -138,7 +138,7 @@ sircalc_results %>% print(n = 100)
 
 
 ## -----------------------------------------------------------------------------
-#The summarize function is versatile. Her for example the summary by
+#The summarize function is versatile. Here for example the summary with minimal output
 
 sircalc_results %>%
   #summarize results across region, age, year and t_site

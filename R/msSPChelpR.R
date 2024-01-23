@@ -10,7 +10,6 @@
 #' This package follows the principles of the "tidyverse".
 #'
 #'
-#' @docType package
 #' @name msSPChelpR
 #' @keywords internal
 NULL
@@ -71,7 +70,9 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c(".",
                                                         "sex_group",
                                                         "year_group",
                                                         "race_group",
-                                                        "site_group"
+                                                        "site_group",
+                                                        "new_var",
+                                                        "t_histgroupiarc"
                                                         )) 
 release_questions <- function() {
   c(
@@ -89,4 +90,6 @@ release_questions <- function() {
 
 
 # previous_checks <- rhub::list_my_checks(email = "marian.eberl@tum.de")
-# previous_checks[[3]][[15]]2
+# group_id <- previous_checks$group[1]
+# group_check <- rhub::get_check(group_id)
+# group_check

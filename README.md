@@ -7,7 +7,7 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/msSPChelpR)](https://cran.r-project.org/package=msSPChelpR)
-[![](https://img.shields.io/badge/dev%20-0.9.0-green.svg)](https://github.com/marianschmidt/msSPChelpR)
+[![](https://img.shields.io/badge/dev%20-0.9.0.9000-green.svg)](https://github.com/marianschmidt/msSPChelpR)
 [![DOI](https://zenodo.org/badge/185602745.svg)](https://zenodo.org/badge/latestdoi/185602745)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -34,8 +34,8 @@ install.packages("msSPChelpR")
 And the development version from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("marianschmidt/msSPChelpR")
+# install.packages("remotes")
+remotes::install_github("marianschmidt/msSPChelpR")
 ```
 
 ## How to use the package

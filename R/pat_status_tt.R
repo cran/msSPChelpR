@@ -1,5 +1,5 @@
 
-#' Calculate patient status at specific end of follow-up - tidytable version
+#' Determine patient status at specific end of follow-up - tidytable version
 #'
 #' @param wide_df dataframe or data.table in wide format
 #' @param fu_end end of follow-up in time format YYYY-MM-DD.
@@ -54,7 +54,7 @@
 #'                        
 
 
-pat_status_tt <- function(wide_df, fu_end = NULL, dattype = NULL, 
+pat_status_tt <- function(wide_df, fu_end, dattype = NULL, 
                           status_var = "p_status", life_var = NULL, spc_var = NULL, birthdat_var = NULL, lifedat_var = NULL, lifedatmin_var = NULL,
                           fcdat_var = NULL, spcdat_var = NULL, 
                           life_stat_alive = NULL, life_stat_dead = NULL, spc_stat_yes = NULL, spc_stat_no = NULL, lifedat_fu_end = NULL,
@@ -64,134 +64,141 @@ pat_status_tt <- function(wide_df, fu_end = NULL, dattype = NULL,
   
   
   if(!is.null(dattype)){
-  #setting default var names and values for SEER data
-  if (dattype == "seer"){
-    if(is.null(life_var)){
-      life_var <- rlang::sym("STAT_REC.1")
-    } else{
-      life_var <- rlang::ensym(life_var)
+    #setting default var names and values for SEER data
+    if (dattype == "seer"){
+      if(is.null(life_var)){
+        life_var <- rlang::sym("STAT_REC.1")
+      } else{
+        life_var <- rlang::ensym(life_var)
+      }
+      if(is.null(spc_var)){
+        spc_var <- rlang::sym("p_spc")
+      } else{
+        spc_var <- rlang::ensym(spc_var)
+      }
+      if(is.null(birthdat_var)){
+        birthdat_var <- rlang::sym("p_datebirth")
+      } else{
+        birthdat_var <- rlang::ensym(birthdat_var)
+      }
+      if(is.null(lifedat_var)){
+        lifedat_var <- rlang::sym("p_datedeath")
+      } else{
+        lifedat_var <- rlang::ensym(lifedat_var)
+      }
+      if(is.null(lifedatmin_var) & use_lifedatmin == TRUE){
+        lifedatmin_var <- rlang::sym("p_dodmin")
+      } else if(use_lifedatmin == TRUE){
+        lifedatmin_var <- rlang::ensym(lifedatmin_var)
+      }
+      if(is.null(fcdat_var)){
+        fcdat_var <- rlang::sym("t_datediag.1")
+      } else{
+        fcdat_var <- rlang::ensym(fcdat_var)
+      }
+      if(is.null(spcdat_var)){
+        spcdat_var <- rlang::sym("t_datediag.2")
+      } else{
+        spcdat_var <- rlang::ensym(spcdat_var)
+      }
+      if(is.null(life_stat_alive)){
+        life_stat_alive <- rlang::quo("Alive")
+      } else{
+        life_stat_alive <- rlang::enquo(life_stat_alive)
+      }
+      if(is.null(life_stat_dead)){
+        life_stat_dead <- rlang::quo("Dead")
+      } else{
+        life_stat_dead <- rlang::enquo(life_stat_dead)
+      }
+      if(is.null(spc_stat_yes)){
+        spc_stat_yes <- rlang::quo("SPC developed")
+      } else{
+        spc_stat_yes <- rlang::enquo(spc_stat_yes)
+      }
+      if(is.null(spc_stat_no)){
+        spc_stat_no <- rlang::quo("No SPC")
+      } else{
+        spc_stat_no <- rlang::enquo(spc_stat_no)
+      }
+      if(is.null(lifedat_fu_end)){
+        lifedat_fu_end <- rlang::quo("2016-12-31")
+      } else{
+        lifedat_fu_end <- rlang::enquo(lifedat_fu_end)
+      }
     }
-    if(is.null(spc_var)){
-      spc_var <- rlang::sym("p_spc")
-    } else{
-      spc_var <- rlang::ensym(spc_var)
+    
+    #setting default var names and values for ZfKD data
+    if (dattype == "zfkd"){
+      if(is.null(life_var)){
+        life_var <- rlang::sym("TOD.1")
+      } else{
+        life_var <- rlang::ensym(life_var)
+      }
+      if(is.null(spc_var)){
+        spc_var <- rlang::sym("p_spc")
+      } else{
+        spc_var <- rlang::ensym(spc_var)
+      }
+      if(is.null(birthdat_var)){
+        birthdat_var <- rlang::sym("GDIMP.1")
+      } else{
+        birthdat_var <- rlang::ensym(birthdat_var)
+      }
+      if(is.null(lifedat_var)){
+        lifedat_var <- rlang::sym("SDIMP.1")
+      } else{
+        lifedat_var <- rlang::ensym(lifedat_var)
+      }
+      if(is.null(lifedatmin_var) & use_lifedatmin == TRUE){
+        lifedatmin_var <- rlang::sym("p_dodmin")
+      } else if(use_lifedatmin == TRUE){
+        lifedatmin_var <- rlang::ensym(lifedatmin_var)
+      }
+      if(is.null(fcdat_var)){
+        fcdat_var <- rlang::sym("DDIMP.1")
+      } else{
+        fcdat_var <- rlang::ensym(fcdat_var)
+      }
+      if(is.null(spcdat_var)){
+        spcdat_var <- rlang::sym("DDIMP.2")
+      } else{
+        spcdat_var <- rlang::ensym(spcdat_var)
+      }
+      if(is.null(life_stat_alive)){
+        life_stat_alive <- rlang::quo("no (patient alive)")
+      } else{
+        life_stat_alive <- rlang::enquo(life_stat_alive)
+      }
+      if(is.null(life_stat_dead)){
+        life_stat_dead <- rlang::quo("yes (patient deceased)")
+      } else{
+        life_stat_dead <- rlang::enquo(life_stat_dead)
+      }
+      if(is.null(spc_stat_yes)){
+        spc_stat_yes <- rlang::quo("SPC developed")
+      } else{
+        spc_stat_yes <- rlang::enquo(spc_stat_yes)
+      }
+      if(is.null(spc_stat_no)){
+        spc_stat_no <- rlang::quo("No SPC")
+      } else{
+        spc_stat_no <- rlang::enquo(spc_stat_no)
+      }
+      if(is.null(lifedat_fu_end)){
+        lifedat_fu_end <- rlang::quo("2017-03-31")
+      } else{
+        lifedat_fu_end <- rlang::enquo(lifedat_fu_end)
+      }
     }
-    if(is.null(birthdat_var)){
-      birthdat_var <- rlang::sym("p_datebirth")
-    } else{
-      birthdat_var <- rlang::ensym(birthdat_var)
-    }
-    if(is.null(lifedat_var)){
-      lifedat_var <- rlang::sym("p_datedeath")
-    } else{
-      lifedat_var <- rlang::ensym(lifedat_var)
-    }
-    if(is.null(lifedatmin_var) & use_lifedatmin == TRUE){
-      lifedatmin_var <- rlang::sym("p_dodmin")
-    } else if(use_lifedatmin == TRUE){
-      lifedatmin_var <- rlang::ensym(lifedatmin_var)
-    }
-    if(is.null(fcdat_var)){
-      fcdat_var <- rlang::sym("t_datediag.1")
-    } else{
-      fcdat_var <- rlang::ensym(fcdat_var)
-    }
-    if(is.null(spcdat_var)){
-      spcdat_var <- rlang::sym("t_datediag.2")
-    } else{
-      spcdat_var <- rlang::ensym(spcdat_var)
-    }
-    if(is.null(life_stat_alive)){
-      life_stat_alive <- rlang::quo("Alive")
-    } else{
-      life_stat_alive <- rlang::enquo(life_stat_alive)
-    }
-    if(is.null(life_stat_dead)){
-      life_stat_dead <- rlang::quo("Dead")
-    } else{
-      life_stat_dead <- rlang::enquo(life_stat_dead)
-    }
-    if(is.null(spc_stat_yes)){
-      spc_stat_yes <- rlang::quo("SPC developed")
-    } else{
-      spc_stat_yes <- rlang::enquo(spc_stat_yes)
-    }
-    if(is.null(spc_stat_no)){
-      spc_stat_no <- rlang::quo("No SPC")
-    } else{
-      spc_stat_no <- rlang::enquo(spc_stat_no)
-    }
-    if(is.null(lifedat_fu_end)){
-      lifedat_fu_end <- rlang::quo("2016-12-31")
-    } else{
-      lifedat_fu_end <- rlang::enquo(lifedat_fu_end)
-    }
-  }
-  
-  #setting default var names and values for ZfKD data
-  if (dattype == "zfkd"){
-    if(is.null(life_var)){
-      life_var <- rlang::sym("TOD.1")
-    } else{
-      life_var <- rlang::ensym(life_var)
-    }
-    if(is.null(spc_var)){
-      spc_var <- rlang::sym("p_spc")
-    } else{
-      spc_var <- rlang::ensym(spc_var)
-    }
-    if(is.null(birthdat_var)){
-      birthdat_var <- rlang::sym("GDIMP.1")
-    } else{
-      birthdat_var <- rlang::ensym(birthdat_var)
-    }
-    if(is.null(lifedat_var)){
-      lifedat_var <- rlang::sym("SDIMP.1")
-    } else{
-      lifedat_var <- rlang::ensym(lifedat_var)
-    }
-    if(is.null(lifedatmin_var) & use_lifedatmin == TRUE){
-      lifedatmin_var <- rlang::sym("p_dodmin")
-    } else if(use_lifedatmin == TRUE){
-      lifedatmin_var <- rlang::ensym(lifedatmin_var)
-    }
-    if(is.null(fcdat_var)){
-      fcdat_var <- rlang::sym("DDIMP.1")
-    } else{
-      fcdat_var <- rlang::ensym(fcdat_var)
-    }
-    if(is.null(spcdat_var)){
-      spcdat_var <- rlang::sym("DDIMP.2")
-    } else{
-      spcdat_var <- rlang::ensym(spcdat_var)
-    }
-    if(is.null(life_stat_alive)){
-      life_stat_alive <- rlang::quo("no (patient alive)")
-    } else{
-      life_stat_alive <- rlang::enquo(life_stat_alive)
-    }
-    if(is.null(life_stat_dead)){
-      life_stat_dead <- rlang::quo("yes (patient deceased)")
-    } else{
-      life_stat_dead <- rlang::enquo(life_stat_dead)
-    }
-    if(is.null(spc_stat_yes)){
-      spc_stat_yes <- rlang::quo("SPC developed")
-    } else{
-      spc_stat_yes <- rlang::enquo(spc_stat_yes)
-    }
-    if(is.null(spc_stat_no)){
-      spc_stat_no <- rlang::quo("No SPC")
-    } else{
-      spc_stat_no <- rlang::enquo(spc_stat_no)
-    }
-    if(is.null(lifedat_fu_end)){
-      lifedat_fu_end <- rlang::quo("2017-03-31")
-    } else{
-      lifedat_fu_end <- rlang::enquo(lifedat_fu_end)
-    }
-  }
   } else{
+    # check that no param is missing
+    if(is.null(life_stat_alive) | is.null(life_stat_dead) | is.null(spc_stat_yes) |
+       is.null(spc_stat_no) | is.null(lifedat_fu_end)){
+      rlang::abort(paste0("You have used dattype == `NULL`. 
+      This means you need to define all parameters: `life_stat_alive`, `life_stat_dead`, `spc_stat_yes`, `spc_stat_no`, `lifedat_fu_end`. 
+                          Please check, because at least one of them is `NULL`" ))
+    }
     # ensym if no dattype is given
     life_var <- rlang::ensym(life_var)
     spc_var <- rlang::ensym(spc_var)
@@ -221,19 +228,23 @@ pat_status_tt <- function(wide_df, fu_end = NULL, dattype = NULL,
     rlang::abort(paste0("The following variables defined are not found in the provided dataframe: ", paste(not_found, collapse=", ")))
   }
   
-  #check whether date was provided in correct format
-  fu_end <- rlang::enquo(fu_end)
-  if(!lubridate::is.Date(as.Date(rlang::eval_tidy(fu_end), date.format = "%y-%m-%d"))) {
+  #get used FU date from function parameter and from label of status_var
+  fu_end_param <- as.Date(rlang::as_name(fu_end), date.format = "%y-%m-%d")
+  fu_end_quo <- rlang::enquo(fu_end_param)
+  
+  #check whether date is provided in correct format
+  
+  if(lubridate::is.Date(fu_end_param) == FALSE) {
     rlang::abort("You have not provided a correct Follow-up date in the format YYYY-MM-DD")
   }
   
   #make label for new variable
-  statvar_label <- paste("Patient Status at end of follow-up", rlang::as_name(fu_end))
+  statvar_label <- paste("Patient Status at end of follow-up", fu_end_param)
   
   #check whether spc_var is coherent with date (to catch cases where old p_spc is used and data is filtered afterwards)
   
   n_errorspc <- wide_df %>% 
-    tidytable::filter.(
+    tidytable::filter(
       #scenario 1 -> p_spc indicates SPC developed, but spcdat_var is empty
       (!!spc_var == !!spc_stat_yes & is.na(rlang::eval_tidy(!!spcdat_var))) |
         #secnario 2 -> p_spc indicates no SPC, but spcdat_var is filled
@@ -260,10 +271,10 @@ pat_status_tt <- function(wide_df, fu_end = NULL, dattype = NULL,
   if(use_lifedatmin == TRUE){
     wide_df <- wide_df %>%
       #option use_lifedatmin option is used and date of death is missing -> replace by lifedatamin
-      tidytable::mutate.(
+      tidytable::mutate(
         #copy old lifedat_var
         p_datedeath_orig = !!lifedat_var,
-        !!lifedat_var := tidytable::case.(
+        !!lifedat_var := tidytable::case(
           is.na(rlang::eval_tidy(!!lifedat_var)), !!lifedatmin_var,
           default = !!lifedat_var)
       ) 
@@ -272,57 +283,57 @@ pat_status_tt <- function(wide_df, fu_end = NULL, dattype = NULL,
   #calculate new status_var variable and label it
   #todo: implement check on date of spc_diagnosis and date of birth and introduce new status.
   wide_df <- wide_df %>%
-    tidytable::mutate.(!!status_var := tidytable::case.(
+    tidytable::mutate(!!status_var := tidytable::case(
       #patient is not born before end of follow-up
-      !!birthdat_var > !!fu_end, 97,
+      !!birthdat_var > fu_end_param, 97,
       #patient has not developed FC before end of follow-up
-      !!fcdat_var > !!fu_end, 98,
+      !!fcdat_var > fu_end_param, 98,
       #patient date of death is missing
-      !!life_var == !!life_stat_dead & is.na(rlang::eval_tidy(!!lifedat_var)) & !!lifedat_fu_end > !!fu_end, 99,
+      !!life_var == !!life_stat_dead & is.na(rlang::eval_tidy(!!lifedat_var)) & !!lifedat_fu_end > fu_end_param, 99,
       #patient is alive after FC and before end of FU (independet of whether SPC has developed or not after FU)
       !!spc_var == !!spc_stat_no & !!life_var == !!life_stat_alive, 1,
-      !!spc_var == !!spc_stat_no & !!life_var == !!life_stat_dead & !!lifedat_var > !!fu_end, 1,
-      !!spc_var == !!spc_stat_yes & !!spcdat_var > !!fu_end & !!life_var == !!life_stat_alive, 1,
-      !!spc_var == !!spc_stat_yes & !!spcdat_var > !!fu_end & !!life_var == !!life_stat_dead & !!lifedat_var > !!fu_end, 1,
+      !!spc_var == !!spc_stat_no & !!life_var == !!life_stat_dead & !!lifedat_var > fu_end_param, 1,
+      !!spc_var == !!spc_stat_yes & !!spcdat_var > fu_end_param & !!life_var == !!life_stat_alive, 1,
+      !!spc_var == !!spc_stat_yes & !!spcdat_var > fu_end_param & !!life_var == !!life_stat_dead & !!lifedat_var > fu_end_param, 1,
       #patient is alive after SPC and before end of FU
-      !!spc_var == !!spc_stat_yes & !!spcdat_var <= !!fu_end & !!life_var == !!life_stat_alive, 2,
-      !!spc_var == !!spc_stat_yes & !!spcdat_var <= !!fu_end & !!life_var == !!life_stat_dead & !!lifedat_var > !!fu_end, 2,
+      !!spc_var == !!spc_stat_yes & !!spcdat_var <= fu_end_param & !!life_var == !!life_stat_alive, 2,
+      !!spc_var == !!spc_stat_yes & !!spcdat_var <= fu_end_param & !!life_var == !!life_stat_dead & !!lifedat_var > fu_end_param, 2,
       #patient is dead after FC and before end of FU
-      !!spc_var == !!spc_stat_no & !!life_var == !!life_stat_dead & !!lifedat_var <= !!fu_end, 3,
-      !!spc_var == !!spc_stat_no & !!life_var == !!life_stat_dead & is.na(rlang::eval_tidy(!!lifedat_var)) & !!lifedat_fu_end <= !!fu_end, 3,
+      !!spc_var == !!spc_stat_no & !!life_var == !!life_stat_dead & !!lifedat_var <= fu_end_param, 3,
+      !!spc_var == !!spc_stat_no & !!life_var == !!life_stat_dead & is.na(rlang::eval_tidy(!!lifedat_var)) & !!lifedat_fu_end <= fu_end_param, 3,
       #patient is dead after SPC and before end of FU
-      !!spc_var == !!spc_stat_yes & !!spcdat_var <= !!fu_end & !!life_var == !!life_stat_dead & !!lifedat_var <= !!fu_end, 4,
-      !!spc_var == !!spc_stat_yes & !!spcdat_var <= !!fu_end & !!life_var == !!life_stat_dead & is.na(rlang::eval_tidy(!!lifedat_var)) & !!lifedat_fu_end <= !!fu_end, 4,
+      !!spc_var == !!spc_stat_yes & !!spcdat_var <= fu_end_param & !!life_var == !!life_stat_dead & !!lifedat_var <= fu_end_param, 4,
+      !!spc_var == !!spc_stat_yes & !!spcdat_var <= fu_end_param & !!life_var == !!life_stat_dead & is.na(rlang::eval_tidy(!!lifedat_var)) & !!lifedat_fu_end <= fu_end_param, 4,
       default = NA_real_)) 
   
   #enforce option use_lifedatmin == TRUE - part 2
   
   if(use_lifedatmin == TRUE){
     wide_df <- wide_df %>%
-      tidytable::mutate.(
+      tidytable::mutate(
         #replace temporary lifedat_var values with values from old lifedat_var
         !!lifedat_var := p_datedeath_orig
       ) %>%
       #remove p_datedeath_orig
-      tidytable::select.(-tidyselect::all_of("p_datedeath_orig"))
+      tidytable::select(-tidyselect::all_of("p_datedeath_orig"))
   }
   
   wide_df <- wide_df%>%
     #label new variable
     sjlabelled::var_labels(!!status_var := !!statvar_label) %>%
-    sjlabelled::val_labels(!!status_var := c("patient alive after FC (with or without following SPC after end of FU)" = 1,
-                                             "patient alive after SPC" = 2,
-                                             "patient dead after FC" = 3,
-                                             "patient dead after SPC" = 4,
-                                             "NA - patient not born before end of FU" = 97,
-                                             "NA - patient did not develop cancer before end of FU" = 98,
-                                             "NA - patient date of death is missing" = 99),
+    sjlabelled::val_labels(!!status_var := c("Patient alive after FC (with or without following SPC after end of FU)" = 1,
+                                             "Patient alive after SPC" = 2,
+                                             "Patient dead after FC" = 3,
+                                             "Patient dead after SPC" = 4,
+                                             "NA - Patient not born before end of FU" = 97,
+                                             "NA - Patient did not develop cancer before end of FU" = 98,
+                                             "NA - Patient date of death is missing" = 99),
                            force.labels = TRUE)
   
   #enforce option as_labelled_factor = TRUE
   if(as_labelled_factor == TRUE){
     wide_df <- wide_df %>%
-      tidytable::mutate.(!!status_var := sjlabelled::as_label(!!status_var, keep.labels=TRUE))
+      tidytable::mutate(!!status_var := sjlabelled::as_label(!!status_var, keep.labels=TRUE))
   }
   
   #----Checks end
@@ -330,12 +341,12 @@ pat_status_tt <- function(wide_df, fu_end = NULL, dattype = NULL,
   #conduct check on new variable
   if(check == TRUE){
     check_tab <- wide_df %>%
-      tidytable::count.(!!life_var, !!status_var)
+      tidytable::count(!!life_var, !!status_var, name = "n")
     
     print(check_tab)
     
     freq_tab <- wide_df %>%
-      tidytable::count.(!!status_var)
+      tidytable::count(!!status_var, name = "n")
     
     print(freq_tab)
     
